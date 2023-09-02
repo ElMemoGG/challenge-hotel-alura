@@ -282,16 +282,6 @@ public class Busqueda extends JFrame {
 			}
 		});
 
-		/*EntityManager em = JPAUtils.getEntityManager();
-
-		HuespedController huespedController = new HuespedController(em);
-		huespedController.cargarTabla(tbHuespedes, modeloHuesped);
-
-		ReservasController reservasController = new ReservasController(em);
-		reservasController.cargarTabla(tbReservas, modelo);*/
-
-		//ReservaController reservaController = new ReservaController(em);
-		//reservaController.cargarTabla(tbReservas, modelo);
 
 		cargarTablas();
 	}

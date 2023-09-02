@@ -58,11 +58,6 @@ public class HuespedDao {
         em.getTransaction().commit();
         em.clear();
 
-     /*   String jpql = "DELETE FROM Huesped WHERE id= :id";
-        System.out.println(jpql);
-        em.getTransaction().begin();
-        em.createQuery(jpql).setParameter("id", id).executeUpdate();
-        em.getTransaction().commit();*/
 
     }
 
@@ -75,6 +70,7 @@ public class HuespedDao {
         return true; //Es numerico
     }
 
+    //Buscador que busca por el apellido del huesped o por su id
     public List<Huesped> buscador(String busqueda) {
         StringBuilder jpql = new StringBuilder("SELECT H FROM Huesped H ");
         //String jpql = "SELECT H FROM Huesped H where apellido like :busqueda OR id=:idB";
@@ -97,10 +93,6 @@ public class HuespedDao {
         System.out.println(query);
         return query.getResultList();
 
-        /*return em.createQuery(jpql, Huesped.class)
-                .setParameter("busqueda", "%" + busqueda + "%")
-                .setParameter("idB",  Integer.parseInt(busqueda))
-                .getResultList();*/
     }
 
 

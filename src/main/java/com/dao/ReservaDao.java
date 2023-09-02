@@ -67,9 +67,8 @@ public class ReservaDao {
         return true; //Es numerico
     }
 
+    //Bucador que busca por id de la reserva o poer el nombre del huesped de la reserva
     public List<Reserva> buscar(String busqueda) {
-       // String jpql = "SELECT R FROM Reserva AS R WHERE id=:id";
-       // return em.createQuery(jpql, Reserva.class).setParameter("busqueda", "%" + busqueda + "%").getResultList();
         StringBuilder jpql = new StringBuilder("SELECT R FROM Reserva R ");
 
 

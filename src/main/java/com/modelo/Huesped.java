@@ -19,13 +19,6 @@ public class Huesped {
     private LocalDate fechaNacimiento;
     private String nacionalidad;
     private String telefono;
-    //@OneToMany
-    /*private List<Reserva> idReserva = new ArrayList<>();*/
-    /*@ManyToOne(fetch=FetchType.LAZY)
-    private Reserva reserva;*/
-
-    /*@OneToMany(cascade=CascadeType.ALL, targetEntity=Reserva.class)
-    private Set<Reserva> reserva = new HashSet<>();*/
     @OneToMany(mappedBy = "huesped", cascade = CascadeType.REMOVE)
     private List<Reserva> items = new ArrayList<>();
 
