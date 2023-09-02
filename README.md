@@ -13,6 +13,7 @@ Con la aplicación del hotel alura el usuario podrá:
 - Java 11
 - Hibernate 5.6
 - Java Swing
+- MySql 8.0.26
 
 ## Capturas de pantalla de la aplicación  
 
