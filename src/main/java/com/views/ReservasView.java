@@ -1,6 +1,6 @@
 package com.views;
 
-import java.awt.EventQueue;
+import javax.persistence.EntityManager;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -10,7 +10,12 @@ import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import java.awt.Color;
 import javax.swing.JTextField;
+
+import com.controller.ReservasController;
+import com.modelo.Huesped;
 import com.toedter.calendar.JDateChooser;
+import com.utils.JPAUtils;
+
 import java.awt.Font;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
@@ -20,9 +25,14 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.Toolkit;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
 
 
 @SuppressWarnings("serial")
@@ -37,10 +47,13 @@ public class ReservasView extends JFrame {
 	private JLabel labelExit;
 	private JLabel labelAtras;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
+	Huesped huesped;
+	BigDecimal valor;
+
+/*	public ReservasView(Huesped huesped) {
+
+		this.huesped = huesped;
+		System.out.println(huesped.toString());
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -51,12 +64,29 @@ public class ReservasView extends JFrame {
 				}
 			}
 		});
-	}
+	}*/
+
+	/**
+	 * Launch the application.
+	 */
+/*	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ReservasView frame = new ReservasView();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}*/
 
 	/**
 	 * Create the frame.
 	 */
-	public ReservasView() {
+	public ReservasView(Huesped huesped) {
+
 		super("Reserva");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(ReservasView.class.getResource("/imagenes/aH-40px.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -263,6 +293,16 @@ public class ReservasView extends JFrame {
 		txtFechaSalida.setFont(new Font("Roboto", Font.PLAIN, 18));
 		txtFechaSalida.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
+
+				if(txtFechaEntrada.getDate()!= null && txtFechaSalida.getDate()!= null){
+					ReservasController reservasController = new ReservasController();
+
+					BigDecimal dias = reservasController.calcValor(txtFechaEntrada.getDate().getTime(),txtFechaSalida.getDate().getTime());
+					txtValor.setText(String.valueOf(dias));
+					valor = dias;
+
+				}
+
 				//Activa el evento, después del usuario seleccionar las fechas se debe calcular el valor de la reserva
 			}
 		});
@@ -293,11 +333,37 @@ public class ReservasView extends JFrame {
 
 		JPanel btnsiguiente = new JPanel();
 		btnsiguiente.addMouseListener(new MouseAdapter() {
+
+
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (ReservasView.txtFechaEntrada.getDate() != null && ReservasView.txtFechaSalida.getDate() != null) {		
-					RegistroHuesped registro = new RegistroHuesped();
-					registro.setVisible(true);
+				if (ReservasView.txtFechaEntrada.getDate() != null && ReservasView.txtFechaSalida.getDate() != null) {
+
+					try {
+						EntityManager em = JPAUtils.getEntityManager();
+
+						ReservasController reservasController = new ReservasController(em);
+
+						reservasController.guardar(
+								LocalDate.ofInstant(txtFechaEntrada.getDate().toInstant(), ZoneId.systemDefault()),
+								LocalDate.ofInstant(txtFechaSalida.getDate().toInstant(), ZoneId.systemDefault()),
+								valor,
+								txtFormaPago.getSelectedItem().toString(),
+								huesped);
+
+						JOptionPane.showMessageDialog(null, "Registro exitoso.");
+
+						MenuUsuario usuario = new MenuUsuario();
+						usuario.setVisible(true);
+						dispose();
+
+					}catch (Exception ex){
+						JOptionPane.showMessageDialog(null, "Error.", null, ERROR_MESSAGE);
+						ex.printStackTrace();
+					}
+
+
+
 				} else {
 					JOptionPane.showMessageDialog(null, "Debes llenar todos los campos.");
 				}
@@ -311,7 +377,9 @@ public class ReservasView extends JFrame {
 
 
 	}
-		
+
+
+
 	//Código que permite mover la ventana por la pantalla según la posición de "x" y "y"	
 	 private void headerMousePressed(MouseEvent evt) {
 	        xMouse = evt.getX();

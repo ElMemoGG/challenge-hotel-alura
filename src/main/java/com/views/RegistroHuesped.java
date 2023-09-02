@@ -1,25 +1,28 @@
 package com.views;
 
 import java.awt.EventQueue;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.persistence.EntityManager;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JTextField;
 import java.awt.Color;
+
+import com.controller.HuespedController;
+import com.dao.HuespedDao;
+import com.modelo.Huesped;
 import com.toedter.calendar.JDateChooser;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JLabel;
+import com.utils.JPAUtils;
+
 import java.awt.Font;
-import javax.swing.ImageIcon;
 import java.awt.SystemColor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.text.Format;
 import java.awt.Toolkit;
-import javax.swing.SwingConstants;
-import javax.swing.JSeparator;
+import java.time.LocalDate;
+import java.time.ZoneId;
+
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
 
 @SuppressWarnings("serial")
 public class RegistroHuesped extends JFrame {
@@ -92,9 +95,12 @@ public class RegistroHuesped extends JFrame {
 		btnAtras.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ReservasView reservas = new ReservasView();
-				reservas.setVisible(true);
-				dispose();				
+				//ReservasView reservas = new ReservasView();
+				//reservas.setVisible(true);
+				//dispose();
+				MenuUsuario usuario = new MenuUsuario();
+				usuario.setVisible(true);
+				dispose();
 			}
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -194,19 +200,22 @@ public class RegistroHuesped extends JFrame {
 		lblTitulo.setFont(new Font("Roboto Black", Font.PLAIN, 23));
 		contentPane.add(lblTitulo);
 		
-		JLabel lblNumeroReserva = new JLabel("NÚMERO DE RESERVA");
+		/*JLabel lblNumeroReserva = new JLabel("NÚMERO DE RESERVA");
 		lblNumeroReserva.setBounds(560, 474, 253, 14);
 		lblNumeroReserva.setForeground(SystemColor.textInactiveText);
 		lblNumeroReserva.setFont(new Font("Roboto Black", Font.PLAIN, 18));
-		contentPane.add(lblNumeroReserva);
+		contentPane.add(lblNumeroReserva);*/
 		
-		txtNreserva = new JTextField();
+		/*txtNreserva = new JTextField();
 		txtNreserva.setFont(new Font("Roboto", Font.PLAIN, 16));
 		txtNreserva.setBounds(560, 495, 285, 33);
 		txtNreserva.setColumns(10);
 		txtNreserva.setBackground(Color.WHITE);
 		txtNreserva.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		contentPane.add(txtNreserva);
+		contentPane.add(txtNreserva);*/
+		//txtNreserva.setVisible(false);
+
+
 		
 		JSeparator separator_1_2 = new JSeparator();
 		separator_1_2.setBounds(560, 170, 289, 2);
@@ -238,17 +247,56 @@ public class RegistroHuesped extends JFrame {
 		separator_1_2_4.setBackground(new Color(12, 138, 199));
 		contentPane.add(separator_1_2_4);
 		
-		JSeparator separator_1_2_5 = new JSeparator();
+		/*JSeparator separator_1_2_5 = new JSeparator();
 		separator_1_2_5.setBounds(560, 529, 289, 2);
 		separator_1_2_5.setForeground(new Color(12, 138, 199));
 		separator_1_2_5.setBackground(new Color(12, 138, 199));
-		contentPane.add(separator_1_2_5);
+		contentPane.add(separator_1_2_5);*/
 		
 		JPanel btnguardar = new JPanel();
 		btnguardar.setBounds(723, 560, 122, 35);
 		btnguardar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+
+				if(txtNombre.getText() != null &&
+						txtApellido.getText() != null &&
+						txtFechaN.getDate() != null &&
+						txtNacionalidad.getSelectedItem().toString() != null &&
+						txtTelefono.getText() != null ){
+					try {
+						EntityManager em = JPAUtils.getEntityManager();
+						HuespedController huespedController = new HuespedController(em);
+
+						Huesped huesped = huespedController.guardar(txtNombre.getText(),
+								txtApellido.getText(),
+								LocalDate.ofInstant(txtFechaN.getDate().toInstant(), ZoneId.systemDefault()),
+								txtNacionalidad.getSelectedItem().toString(),
+								txtTelefono.getText());
+
+						JOptionPane.showMessageDialog(null, "Registro exitoso.");
+						ReservasView reservas = new ReservasView(huesped);
+						reservas.setVisible(true);
+						dispose();
+
+
+					}catch (Exception ex){
+						JOptionPane.showMessageDialog(null, "Error.", null, ERROR_MESSAGE);
+						ex.printStackTrace();
+					}
+
+
+				}else {
+					JOptionPane.showMessageDialog(null, "Debes llenar todos los campos.");
+				}
+
+
+
+
+
+
+
+
 			}
 		});
 		btnguardar.setLayout(null);
@@ -309,6 +357,7 @@ public class RegistroHuesped extends JFrame {
 		labelExit.setHorizontalAlignment(SwingConstants.CENTER);
 		labelExit.setForeground(SystemColor.black);
 		labelExit.setFont(new Font("Roboto", Font.PLAIN, 18));
+
 	}
 	
 	
